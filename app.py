@@ -1,115 +1,626 @@
-
 import streamlit as st
 import pandas as pd
 
-# Configure the page
+
+# ============================================================
+# 1. PAGE CONFIGURATION
+# ============================================================
+
 st.set_page_config(
-    page_title="Data Quality Agent",
+    page_title="Data Quality Management Agent",
+    page_icon="📊",
     layout="wide"
 )
 
-st.title("Data Quality Management Agent")
-st.write("Please upload your dataset to begin data analysis.")
 
-# Upload a CSV or Excel file
-uploaded_file = st.file_uploader(
-    "Upload CSV or XLSX file",
-    type=["csv", "xlsx"]
+# ============================================================
+# 2. PROFESSIONAL UI STYLING
+# ============================================================
+
+st.markdown(
+    """
+    <style>
+
+    /* Main application background */
+
+    .stApp {
+        background: #F8FAFC;
+        color: #172554;
+    }
+
+    /* Header */
+
+    [data-testid="stHeader"] {
+        background: rgba(248, 250, 252, 0.92);
+    }
+
+    /* Main content width */
+
+    .block-container {
+        padding-top: 2.2rem;
+        padding-bottom: 3rem;
+        max-width: 1400px;
+    }
+
+    /* Hero banner */
+
+    .hero {
+        background: linear-gradient(
+            120deg,
+            #172554 0%,
+            #1D4ED8 100%
+        );
+
+        padding: 2.2rem;
+        border-radius: 18px;
+
+        color: white;
+
+        margin-bottom: 1.8rem;
+
+        box-shadow: 0 10px 28px
+            rgba(23, 37, 84, 0.14);
+    }
+
+    .hero h1 {
+        color: white !important;
+
+        font-size: 2.15rem;
+        line-height: 1.2;
+
+        margin: 0 0 0.65rem 0;
+
+        font-weight: 750;
+    }
+
+    .hero p {
+        color: #DBEAFE !important;
+
+        font-size: 1.05rem;
+
+        margin: 0;
+    }
+
+    /* Section headings */
+
+    .section-label {
+        color: #172554;
+
+        font-size: 1.2rem;
+        font-weight: 700;
+
+        margin: 0.5rem 0 0.35rem 0;
+    }
+
+    .muted {
+        color: #64748B;
+
+        font-size: 0.95rem;
+    }
+
+    /* File uploader card */
+
+    div[data-testid="stFileUploader"] {
+        background: white;
+
+        border: 1px solid #DCE5F2;
+        border-radius: 14px;
+
+        padding: 1rem 1.1rem;
+
+        box-shadow: 0 4px 16px
+            rgba(15, 23, 42, 0.04);
+    }
+
+    /* Metric cards */
+
+    div[data-testid="stMetric"] {
+        background: white;
+
+        border: 1px solid #E2E8F0;
+        border-radius: 14px;
+
+        padding: 1rem 1.1rem;
+
+        box-shadow: 0 4px 14px
+            rgba(15, 23, 42, 0.04);
+    }
+
+    /* Metric labels */
+
+    div[data-testid="stMetricLabel"] {
+        color: #64748B;
+        font-weight: 600;
+    }
+
+    /* Metric values */
+
+    div[data-testid="stMetricValue"] {
+        color: #172554;
+        font-weight: 750;
+    }
+
+    /* Data tables */
+
+    div[data-testid="stDataFrame"] {
+        background: white;
+
+        border: 1px solid #E2E8F0;
+        border-radius: 12px;
+
+        padding: 0.25rem;
+    }
+
+    /* Information message */
+
+    .status-note {
+        background: #EFF6FF;
+
+        border-left: 4px solid #2563EB;
+
+        padding: 0.85rem 1rem;
+
+        border-radius: 8px;
+
+        color: #1E3A8A;
+
+        margin: 0.5rem 0 1rem 0;
+    }
+
+    /* Buttons */
+
+    div.stButton > button,
+    div.stDownloadButton > button {
+
+        border-radius: 9px;
+
+        border: 1px solid #2563EB;
+
+        background: #2563EB;
+
+        color: white;
+
+        font-weight: 600;
+
+        padding: 0.55rem 1rem;
+
+    }
+
+    div.stButton > button:hover,
+    div.stDownloadButton > button:hover {
+
+        background: #1D4ED8;
+
+        border-color: #1D4ED8;
+
+        color: white;
+
+    }
+
+    /* Responsive layout */
+
+    @media (max-width: 700px) {
+
+        .hero {
+            padding: 1.4rem;
+        }
+
+        .hero h1 {
+            font-size: 1.65rem;
+        }
+
+    }
+
+    </style>
+    """,
+    unsafe_allow_html=True
 )
 
 
+# ============================================================
+# 3. APPLICATION HEADER
+# ============================================================
+
+st.markdown(
+    """
+    <div class="hero">
+
+        <h1>
+            Data Quality Management Agent
+        </h1>
+
+        <p>
+            Profile your dataset, spot completeness gaps,
+            and review duplicate records.
+        </p>
+
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+
+# ============================================================
+# 4. FILE UPLOAD SECTION
+# ============================================================
+
+st.markdown(
+    """
+    <div class="section-label">
+        Start with your dataset
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown(
+    """
+    <p class="muted">
+        Upload a CSV or Excel workbook to generate
+        a quick data quality profile.
+    </p>
+    """,
+    unsafe_allow_html=True
+)
+
+
+uploaded_file = st.file_uploader(
+    "Upload CSV or XLSX file",
+
+    type=["csv", "xlsx"],
+
+    help="Supported formats: CSV and Excel (.xlsx).",
+
+    key="dataset_uploader"
+)
+
+
+# ============================================================
+# 5. LOAD DATA
+# ============================================================
+
 def load_data(uploaded_file):
-    """Read the uploaded file into a Pandas DataFrame."""
+
+    """
+    Load CSV or Excel data into a Pandas DataFrame.
+    """
 
     filename = uploaded_file.name.lower()
 
     if filename.endswith(".csv"):
-        return pd.read_csv(uploaded_file)
-    elif filename.endswith(".xlsx"):
-        return pd.read_excel(uploaded_file)
-    else:
-        raise ValueError("Unsupported file type. Please upload CSV or XLSX.")
 
+        return pd.read_csv(uploaded_file)
+
+    elif filename.endswith(".xlsx"):
+
+        return pd.read_excel(uploaded_file)
+
+    else:
+
+        raise ValueError(
+            "Unsupported file type. "
+            "Please upload CSV or XLSX."
+        )
+
+
+# ============================================================
+# 6. DATA QUALITY PROFILING
+# ============================================================
 
 def profile_data(df):
-    """Calculate quality metrics for every column."""
+
+    """
+    Calculate quality metrics for every column.
+    """
 
     row_count = len(df)
+
     profile_rows = []
 
     for column in df.columns:
+
         series = df[column]
 
-        missing_count = int(series.isna().sum())
-        distinct_count = int(series.nunique(dropna=True))
+        # Missing values
 
-        if row_count > 0:
-            missing_pct = missing_count / row_count * 100
-        else:
-            missing_pct = 0
+        missing_count = int(
+            series.isna().sum()
+        )
 
-        completeness_pct = 100 - missing_pct
+        # Distinct values
+
+        distinct_count = int(
+            series.nunique(dropna=True)
+        )
+
+        # Duplicate values in the column
+
+        duplicate_count = int(
+            series.duplicated().sum()
+        )
+
+        # Non-missing values
+
+        non_missing_count = int(
+            series.notna().sum()
+        )
+
+        # Missing percentage
+
+        missing_pct = (
+
+            missing_count / row_count * 100
+
+            if row_count > 0
+
+            else 0
+
+        )
+
+        # Completeness
+
+        completeness_pct = (
+            100 - missing_pct
+        )
+
+        # Uniqueness
+
+        uniqueness_pct = (
+
+            distinct_count / non_missing_count * 100
+
+            if non_missing_count > 0
+
+            else 0
+
+        )
+
+        # Store results
 
         profile_rows.append({
-            "column": str(column),
-            "data_type": str(series.dtype),
-            "row_count": row_count,
-            "missing_count": missing_count,
-            "missing_pct": round(missing_pct, 2),
-            "completeness_pct": round(completeness_pct, 2),
-            "distinct_values": distinct_count,
+
+            "Column": str(column),
+
+            "Data Type": str(series.dtype),
+
+            "Total Rows": row_count,
+
+            "Missing Count": missing_count,
+
+            "Missing %": round(
+                missing_pct, 2
+            ),
+
+            "Completeness %": round(
+                completeness_pct, 2
+            ),
+
+            "Distinct Values": distinct_count,
+
+            "Duplicate Count": duplicate_count,
+
+            "Uniqueness %": round(
+                uniqueness_pct, 2
+            )
+
         })
 
-    # Return the profile only after processing every column
     return pd.DataFrame(profile_rows)
 
 
-# Process the file after the user uploads it
+# ============================================================
+# 7. PROCESS DATASET
+# ============================================================
+
 if uploaded_file is not None:
+
     try:
+
+        # Load dataset
+
         df = load_data(uploaded_file)
 
+        # Validate dataset
+
         if df.empty:
-            st.warning("The file has no data rows.")
+
+            st.warning(
+                "The uploaded file contains no data rows."
+            )
+
             st.stop()
 
+        # Generate profile
+
         profile = profile_data(df)
-        duplicate_rows = int(df.duplicated().sum())
 
-        st.success("File uploaded and processed successfully!")
+        # Calculate duplicate rows
 
-        # Display summary metrics
-        col1, col2, col3 = st.columns(3)
+        duplicate_rows = int(
+            df.duplicated().sum()
+        )
 
-        col1.metric("Rows", f"{len(df):,}")
-        col2.metric("Columns", f"{len(df.columns):,}")
-        col3.metric("Duplicate rows", f"{duplicate_rows:,}")
+        # Calculate overall completeness
 
-        # Display the data quality profile
-        st.subheader("Column-Level Data Quality Profile")
+        total_cells = int(
+            df.shape[0] * df.shape[1]
+        )
+
+        missing_cells = int(
+            df.isna().sum().sum()
+        )
+
+        overall_completeness = (
+
+            (
+                (total_cells - missing_cells)
+                / total_cells
+            ) * 100
+
+            if total_cells > 0
+
+            else 0
+
+        )
+
+        # Success message
+
+        st.markdown(
+            """
+            <div class="status-note">
+                <strong>Analysis complete.</strong>
+                Your file was processed successfully.
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+
+        # ====================================================
+        # 8. DATASET OVERVIEW
+        # ====================================================
+
+        st.markdown(
+            """
+            <div class="section-label">
+                Dataset overview
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        col1, col2, col3, col4 = st.columns(4)
+
+        col1.metric(
+            "Total Rows",
+            f"{len(df):,}"
+        )
+
+        col2.metric(
+            "Total Columns",
+            f"{len(df.columns):,}"
+        )
+
+        col3.metric(
+            "Duplicate Rows",
+            f"{duplicate_rows:,}"
+        )
+
+        col4.metric(
+            "Completeness",
+            f"{overall_completeness:.2f}%"
+        )
+
+
+        # ====================================================
+        # 9. COLUMN-LEVEL DATA QUALITY
+        # ====================================================
+
+        st.markdown(
+            """
+            <div class="section-label">
+                Column-level data quality
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
+        st.markdown(
+            """
+            <p class="muted">
+                Review missing values, completeness,
+                data types, distinct values, and duplicates
+                for every column.
+            </p>
+            """,
+            unsafe_allow_html=True
+        )
+
         st.dataframe(
             profile,
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
 
-        # Display sample records
-        st.subheader("Dataset Preview")
+
+        # ====================================================
+        # 10. DATASET PREVIEW
+        # ====================================================
+
+        st.markdown(
+            """
+            <div class="section-label">
+                Dataset preview
+            </div>
+            """,
+            unsafe_allow_html=True
+        )
+
         st.dataframe(
             df.head(10),
-            use_container_width=True,
+            width="stretch",
             hide_index=True
         )
 
-        # Allow downloading the report
+
+        # ====================================================
+        # 11. DOWNLOAD REPORT
+        # ====================================================
+
+        report_csv = profile.to_csv(
+            index=False
+        ).encode("utf-8")
+
         st.download_button(
-            "Download Profiling Report",
-            data=profile.to_csv(index=False).encode("utf-8"),
+
+            label="Download profiling report (CSV)",
+
+            data=report_csv,
+
             file_name="data_quality_profile.csv",
+
             mime="text/csv"
+
+        )
+
+
+    # ========================================================
+    # 12. ERROR HANDLING
+    # ========================================================
+
+    except ImportError as error:
+
+        st.error(
+            f"A required package is missing: {error}. "
+            "Check requirements.txt and redeploy."
         )
 
     except Exception as error:
-        st.error(f"Unable to process the file: {error}")
+
+        st.error(
+            f"Unable to process the file: {error}"
+        )
 
 
+# ============================================================
+# 13. INITIAL STATE
+# ============================================================
+
+else:
+
+    st.markdown(
+        """
+        <div class="status-note">
+
+            <strong>What you'll get:</strong>
+
+            <br><br>
+
+            Row and column counts, duplicate-row count,
+            overall completeness, column-level profiling,
+            dataset preview, and a downloadable report.
+
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
