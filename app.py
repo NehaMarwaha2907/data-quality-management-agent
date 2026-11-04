@@ -152,7 +152,6 @@ def profile_data(df):
         missing_pct = missing_count / row_count * 100 if row_count > 0 else 0
         completeness_pct = 100 - missing_pct
 
-<<<<<<< HEAD
         profile_rows.append({
             "column": str(column),
             "data_type": str(series.dtype),
@@ -163,7 +162,7 @@ def profile_data(df):
             "distinct_values": distinct_count,
             "duplicate_count": duplicate_count,
         })
-=======
+
         profile_rows.append(
             {
                 "column": str(column),
@@ -175,7 +174,7 @@ def profile_data(df):
                 "distinct_values": distinct_count,
             }
         )
->>>>>>> 197ad261eb770bbfba631a04dafae3fa4b0e3b62
+
 
     return pd.DataFrame(profile_rows)
 
@@ -190,7 +189,7 @@ if uploaded_file is not None:
 
         profile = profile_data(df)
         duplicate_rows = int(df.duplicated().sum())
-<<<<<<< HEAD
+
         total_cells = df.shape[0] * df.shape[1]
         total_missing = int(df.isna().sum().sum())
 
@@ -201,7 +200,7 @@ if uploaded_file is not None:
         else:
             overall_completeness = 0
             st.success("File uploaded and processed successfully!")
-=======
+
         total_cells = int(df.shape[0] * df.shape[1])
         missing_cells = int(df.isna().sum().sum())
         overall_completeness = (
@@ -214,7 +213,7 @@ if uploaded_file is not None:
             '<div class="status-note"><strong>Analysis complete.</strong> Your file was processed successfully.</div>',
             unsafe_allow_html=True,
         )
->>>>>>> 197ad261eb770bbfba631a04dafae3fa4b0e3b62
+
 
         st.markdown('<div class="section-label">Dataset overview</div>', unsafe_allow_html=True)
         col1, col2, col3, col4 = st.columns(4)
@@ -247,7 +246,7 @@ if uploaded_file is not None:
         )
     except Exception as error:
         st.error(f"Unable to process the file: {error}")
-<<<<<<< HEAD
+
 
 
 import streamlit as st
@@ -377,7 +376,7 @@ if uploaded_file is not None:
 
     except Exception as error:
         st.error(f"Unable to process the file: {error}")
-=======
+
 else:
     st.markdown(
         """
@@ -388,4 +387,4 @@ else:
         """,
         unsafe_allow_html=True,
     )
->>>>>>> 197ad261eb770bbfba631a04dafae3fa4b0e3b62
+
